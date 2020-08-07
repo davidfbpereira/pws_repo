@@ -1,5 +1,5 @@
 
-# Input: inputs given, but 1) it requires the existence of the
+# Input: it requires the existence of the
 # RockYou.txt original file in the following directory: /files/originals/ 
 
 # Main function: to convert the original RockYou .txt file into a .csv file with a predefined format
