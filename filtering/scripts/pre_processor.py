@@ -39,7 +39,6 @@ def process(file, pre_processed_dataset, stats):
 			output_file.write(dataRow)
 	output_file.close()
 
-	print('\t> The following file was successfully created:', newFile)
 	print('\t> Dataset stats of', newFile, ':', stats)
 
 # returns a dictionary with the following stats: total dataset size and the number of unique/duplicated passwords within the dataset
@@ -58,6 +57,7 @@ def password_counter(pre_processed_dataset):
 
 # returns a data structure with all passwords and their respective count, after pre-processing (removing duplicated passwords) the original .csv file
 def pre_process_csv(file):
+	print('\t> Checking duplicated entries on:', file)
 	processed_dataset, repeated_passwords = {}, []
 
 	with open(os.path.join(read_path, file), 'r') as input_file:
