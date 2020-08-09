@@ -1,3 +1,9 @@
+# Input: 1) it requires the presence of the results .txt files in the following directory: ../results/
+
+# Main function: to assemble all results in the same pickle file
+
+# Output: pickle file with the following format:
+# {dataset : {password : {meter1: classification, meter2: classification}}}
 
 
 import os, sys, math, pickle
@@ -5,7 +11,6 @@ import os, sys, math, pickle
 
 cur_path = os.path.dirname(__file__)
 read_results = os.path.relpath('../results/')
-read_datasets = os.path.relpath('../../sampling/samples')
 
 
 def save_data(assembled_results):
