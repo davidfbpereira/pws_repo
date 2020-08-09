@@ -15,20 +15,7 @@ from itertools import repeat
 
 cur_path = os.path.dirname(__file__)
 read_path = os.path.relpath('../../sampling/samples', cur_path)
-write_path = os.path.relpath('../results', cur_path)
 
-
-def unite(partitions):
-	new_filename = partitions[0].split('_')[0] + '_results.txt'
-	new_directory = os.path.join(write_path)
-
-	with open(os.path.join(new_directory, new_filename), 'a') as output_file:
-		for partition in partitions:
-			with open(os.path.join(new_directory, partition), 'r') as input_file:
-				for line in input_file:
-					output_file.write(line)
-			os.remove(os.path.join(new_directory, partition))
-	print('\nThe following results file was successfully created:', new_filename)
 
 def query(chunks):
 	print(chunks)
@@ -52,7 +39,6 @@ def get_chunks():
 def main():
 	chunks = get_chunks()
 	partitions = query(chunks)
-	#unite(partitions)
 	
 if __name__ == "__main__":
 	main()
