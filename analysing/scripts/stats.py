@@ -98,49 +98,86 @@ def get_stats(passwords):
 					stats[meter][result] += 1
 	return stats
 
-def get_post_distributions(pickle_object):
-	dataset_samples = {}
-	samples, global_sample = {}, []
-	post_data = ''
+def get_post_distributions(pickle_object, pickle_filename):
+	pre_global, pre_dataset, pre_samples = [], {}, {}
+
+	for output, datasets in pickle_object.items():
+		for file, passwords in datasets.items():
+			if file.startswith('RockYou'):
+				if 'RockYou' not in pre_dataset:
+					pre_dataset['RockYou'] = passwords[:]
+				else:
+					pre_dataset['RockYou'].extend(passwords)
+				
+			if file.startswith('LinkedIn'):
+				if 'LinkedIn' not in pre_dataset:
+					pre_dataset['LinkedIn'] = passwords[:]
+				else:
+					pre_dataset['LinkedIn'].extend(passwords)
+
+			if file.startswith('000WebHost'):
+				if '000WebHost' not in pre_dataset:
+					pre_dataset['000WebHost'] = passwords[:]
+				else:
+					pre_dataset['000WebHost'].extend(passwords)
+
+			if file not in pre_samples:
+				pre_samples[file] = passwords[:]
+			else:
+				pre_samples[file].extend(passwords)
+
+			pre_global.extend(passwords)
+
+	pre_global_stats = get_stats(pre_global)
+
+	for dataset, passwords in pre_dataset.items():
+		pre_dataset[dataset] = get_stats(passwords)
+
+	for file, passwords in pre_samples.items():
+		pre_samples[file] = get_stats(passwords)
+		
+
+	global_sample, post_dataset, post_samples = [], {}, {}
+	post_data = '\n\n\n\t\t\t\t' + pickle_filename.split('.')[0].upper() + '\n'
 
 	for output, datasets in pickle_object.items():
 		for file, passwords in datasets.items():
 			if output == 'cracked':
 				if file.startswith('RockYou'):
-					if 'RockYou' not in dataset_samples:
-						dataset_samples['RockYou'] = passwords[:]
+					if 'RockYou' not in post_dataset:
+						post_dataset['RockYou'] = passwords[:]
 					else:
-						dataset_samples['RockYou'].extend(passwords)
+						post_dataset['RockYou'].extend(passwords)
 					
 				elif file.startswith('LinkedIn'):
-					if 'LinkedIn' not in dataset_samples:
-						dataset_samples['LinkedIn'] = passwords[:]
+					if 'LinkedIn' not in post_dataset:
+						post_dataset['LinkedIn'] = passwords[:]
 					else:
-						dataset_samples['LinkedIn'].extend(passwords)
+						post_dataset['LinkedIn'].extend(passwords)
 
 				else:
-					if '000WebHost' not in dataset_samples:
-						dataset_samples['000WebHost'] = passwords[:]
+					if '000WebHost' not in post_dataset:
+						post_dataset['000WebHost'] = passwords[:]
 					else:
-						dataset_samples['000WebHost'].extend(passwords)
+						post_dataset['000WebHost'].extend(passwords)
 
-				if file not in samples:
-					samples[file] = passwords[:]
+				if file not in post_samples:
+					post_samples[file] = passwords[:]
 				else:
-					samples[file].extend(passwords)
+					post_samples[file].extend(passwords)
 
 				global_sample.extend(passwords)
 
-	pre_global_stats = get_stats(global_sample)
-	post_data += process_stats('post attacking phase', 'full sample', pre_global_stats, len(global_sample))
+	global_stats = get_stats(global_sample)
+	post_data += process_attack_stats('attacking phase', 'full sample', global_stats, pre_global_stats, len(global_sample))
 
-	for dataset, passwords in dataset_samples.items():
-		pre_dataset_stats = get_stats(passwords)
-		post_data += process_stats('post attacking phase', dataset, pre_dataset_stats, len(passwords))
+	for dataset, passwords in post_dataset.items():
+		post_dataset_stats = get_stats(passwords)		
+		post_data += process_attack_stats('attacking phase', dataset, post_dataset_stats, pre_dataset[dataset], len(passwords))
 
-	for file, passwords in samples.items():
-		pre_sample_stats = get_stats(passwords)
-		post_data += process_stats('post attacking phase', file, pre_sample_stats, len(passwords))
+	for dataset, passwords in post_samples.items():
+		post_samples_stats = get_stats(passwords)
+		post_data += process_attack_stats('attacking phase', dataset, post_samples_stats, pre_samples[dataset], len(passwords))
 
 	return post_data
 
@@ -200,7 +237,7 @@ def main():
 				pickle_file = open(os.path.join(read_pickle_path, pickle_filename), 'rb')
 				pickle_object = pickle.load(pickle_file)
 				
-				post_data += get_post_distributions(pickle_object)
+				post_data += get_post_distributions(pickle_object, pickle_filename)
 
 	pre_data = get_pre_distributions(pickle_object)
 
